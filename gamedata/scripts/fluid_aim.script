@@ -114,7 +114,7 @@ local function actor_on_update()
 					end
 
 					-- Automatic weapon continue fire after ADS 
-					if axr_main.weapon_is_zoomed and not (state == 5 or fluid_aim_jammed) and (wpn:get_ammo_in_magazine() > 0) and wpn:cast_Weapon():GetFireMode() == -1 then
+					if axr_main.weapon_is_zoomed and not (state == 5 or fluid_aim_jammed) and (wpn:get_ammo_in_magazine() > 0) and is_full_auto(wpn) then
 						level.release_action(bind_to_dik(key_bindings.kWPN_FIRE))
 						CreateTimeEvent("fluid_aim_delay_fire", "fluid_aim_delay_fire", 0, fluid_aim_delay_fire_func)
 					end
@@ -161,6 +161,14 @@ function switch_weapon_state (wpn, fluid_aim_switch_weapon)
 			fluid_aim_switch_weapon = false
 		end
 	end
+end
+
+function is_full_auto(wpn)
+    local retval = ActorMenu.get_maingame().m_ui_hud_states.m_fire_mode:GetText() -- retrieve queue size from UI.
+    if retval == "" then -- HUD turned off, queue size unavailable.
+        retval = wpn:cast_Weapon():GetFireMode() -- fall back to fire mode
+    end
+    return retval == -1 or retval == "A"
 end
 
 -- Weapon Jammed to prevent jam sound when aiming and shooting
